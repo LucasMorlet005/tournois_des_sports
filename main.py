@@ -8,10 +8,11 @@ from PIL import Image, ImageTk
 
 
 
+
 class MainApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry("800x600")
+        self.geometry("768x432")
         self.title("TDS")  
         self.protocol("WM_DELETE_WINDOW", self.quit) # le protocole pour la fermeture safe
         self.page_actuelle = None   #Stocke la page visible à l'écran

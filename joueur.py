@@ -24,7 +24,7 @@ class Joueur(ctk.CTkFrame):
         frame_page.place(x=0 , y=0 )
 
          #Le fond de l'écran d'accueil 
-        image_pil = Image.open("logo.png")
+        image_pil = Image.open("images/logo.jpg")
         self.bg_image = ctk.CTkImage(light_image=image_pil, dark_image=image_pil, size=(354, 302))
 
         self.label_fond = ctk.CTkLabel(frame_page, text="", image = self.bg_image)# Label
