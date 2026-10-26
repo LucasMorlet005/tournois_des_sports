@@ -5,6 +5,7 @@ import tkinter as tk
 import numpy as np
 from accueil import Accueil
 from PIL import Image, ImageTk
+from BanqueDeParticipant import BanqueDeParticipant
 
 
 
@@ -16,6 +17,8 @@ class MainApp(ctk.CTk):
         self.title("TDS")  
         self.protocol("WM_DELETE_WINDOW", self.quit) # le protocole pour la fermeture safe
         self.page_actuelle = None   #Stocke la page visible à l'écran
+
+        self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
 
         self.changer_page(Accueil)
 
@@ -34,4 +37,3 @@ class MainApp(ctk.CTk):
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
-

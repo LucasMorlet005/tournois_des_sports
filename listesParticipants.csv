@@ -1,0 +1,26 @@
+id,nom,categorie,nbTournoi,victoire,defaite,nulle,pointsPour,pointsContre
+1,Martin Tremblay,Hockey,12,8,3,1,42,28
+2,Sophie Gagnon,Soccer,5,3,2,0,14,11
+3,Alexandre Roy,Basketball,20,15,4,1,130,95
+4,Julie Côté,Tennis,8,4,3,1,32,29
+5,Thomas Bouchard,Volleyball,3,1,2,0,8,12
+6,Émilie Gauthier,Hockey,15,10,4,1,55,38
+7,David Morin,Soccer,25,18,5,2,68,42
+8,Camille Lavoie,Basketball,6,4,1,1,45,30
+9,Nicolas Fortin,Tennis,10,6,3,1,38,31
+10,Isabelle Gagné,Volleyball,18,11,6,1,50,44
+11,Antoine Pelletier,Hockey,4,2,2,0,12,15
+12,Laura Bélanger,Soccer,14,9,4,1,39,27
+13,Gabriel Lévesque,Basketball,22,14,6,2,142,110
+14,Sarah Lévesque,Tennis,2,0,2,0,5,12
+15,Maxime Girard,Volleyball,11,7,3,1,33,26
+16,Océane Simard,Hockey,16,12,3,1,60,40
+17,Felix Caron,Soccer,7,5,2,0,21,14
+18,Chloé Beaudoin,Basketball,9,5,4,0,65,62
+19,Mathieu St-Pierre,Tennis,30,22,6,2,105,70
+20,Lea Cloutier,Volleyball,5,2,2,1,15,16
+21,Hugo Nadeau,Hockey,13,8,5,0,44,39
+22,Maya Poirier,Soccer,19,13,5,1,52,36
+23,Samuel Martel,Basketball,3,1,1,1,22,20
+24,Audrey Lapointe,Tennis,17,11,5,1,72,55
+25,William Thibault,Volleyball,21,16,4,1,64,45
