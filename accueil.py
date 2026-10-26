@@ -33,12 +33,13 @@ class Accueil(ctk.CTkFrame):
         self.image_logo = ctk.CTkImage(light_image=image_pil, dark_image=image_pil, size=(84, 72))
         self.label_logo = ctk.CTkLabel(frame_page, text="", image = self.image_logo )
         self.label_logo.place(relx=0.05, rely=0.05)
-        
 
-
-        label_1 = ctk.CTkLabel(frame_page, text ="Page d'accueil", font=("Arial", 20, "bold") , fg_color= "black")
-        label_1.place(relx=0.1 ,rely = 0.5)
-
-        from Page_Choisir_Catégorie import Page_Choisir_Categorie
-        button_changer_page = ctk.CTkButton(frame_page, text = "Aller au joueur" , command =lambda: self.controlleur.changer_page(Page_Choisir_Categorie))
+        #button pour aller à la page créer tournoi
+        from Page_Creer_tournoi_Choisir_Categorie import Page_Creer_tournoi_Choisir_Categorie
+        button_changer_page = ctk.CTkButton(frame_page, text = "Créer un tournoi" , command =lambda: self.controlleur.changer_page(Page_Creer_tournoi_Choisir_Categorie))
         button_changer_page.place(relx = 0.7 , rely = 0.7)
+
+        # bouton pour aller à la page gérer les joueurs
+        from Page_Gerer_Participants import Page_Gerer_Participants
+        button_aller_page_participant = ctk.CTkButton(frame_page, text="Gérer les joueurs", command=lambda: self.controlleur.changer_page(Page_Gerer_Participants))
+        button_aller_page_participant.place(relx = 0.1, rely = 0.7)

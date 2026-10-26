@@ -8,10 +8,6 @@ class Participant :
         self.fiche = [victoire, defaite, nulle] #victoire, défaite, égalité
         self.points = [pointsPour, pointsContre] # points pour, point contre
 
-    def __init__(self, id, nom, categorie):
-        self.__init__(id, nom, categorie, 0, 0, 0, 0, 0, 0)
-
-
     def calculerDifferenciel(self) :
         # le différentiel est la différence entre les points pour et les points contre
         return self.points[0] - self.points[1]
@@ -21,7 +17,7 @@ class Participant :
         # le pourcentage de victoire est le ratio de points sur
         # la possibilité totale de points (2 par  matchs)
 
-        return (self.fiche[0] * 2 + self.fiche[1]) / (2 * (self.fiche[0] + self.fiche[1] + self.fiche[2]))
+        return round((100 * (self.fiche[0] * 2 + self.fiche[1]) / (2 * (self.fiche[0] + self.fiche[1] + self.fiche[2]))), 1)
 
-    def __string__(self) :
-        return f"{self.nom} : {self.calculerPourcentageVictoire} % de victoire."
+    def __str__(self) :
+        return f"{self.nom} : {self.calculerPourcentageVictoire()} % de victoire."

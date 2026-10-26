@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 
 
 
-class Page_Choisir_Categorie(ctk.CTkFrame):
+class Page_Creer_tournoi_Choisir_Categorie(ctk.CTkFrame):
     def __init__ (self, master=None , controlleur= None):
             super().__init__(master)
             self.master = master
@@ -17,7 +17,6 @@ class Page_Choisir_Categorie(ctk.CTkFrame):
 
 
     def combobox_categories_callback(self,choice):
-
          print(choice)
          return
          
@@ -33,16 +32,13 @@ class Page_Choisir_Categorie(ctk.CTkFrame):
         self.label_logo = ctk.CTkLabel(self.frame_page, text="", image = self.bg_image )
         self.label_logo.place(relx=0.05, rely=0.05)
         
-        #titre de la page
-        self.label_titre_page = ctk.CTkLabel(self.frame_page, text ="Création d'un tournois ",text_color="black" , font=("Arial", 20, "bold"))
+        #titre de la page : creer un tournoi
+        self.label_titre_page = ctk.CTkLabel(self.frame_page, text ="Création d'un tournois",text_color="black" , font=("Arial", 20, "bold"))
         self.label_titre_page.place(relx =0.5 ,rely =  0.1 , anchor = "center")
 
-        #choisir la catégorie
+        #sous-titre de la page : choisir la catégorie
         self.label_sous_titre = ctk.CTkLabel(self.frame_page, text ="CHOISIR LA CATÉGORIE ", text_color="black" , font=("Arial", 12, "bold"))
         self.label_sous_titre.place(relx =0.5 ,rely =  0.2 , anchor = "center")
-
-
-
 
         combobox_var = ctk.StringVar(value="option 2")
         self.label_choisir_catégories = ctk.CTkLabel(self.frame_page, text ="Chosir parmis ceux\n déjà enregistrés:", text_color="black" , font=("Arial", 14, "bold"))
@@ -50,22 +46,19 @@ class Page_Choisir_Categorie(ctk.CTkFrame):
         self.combobox_catégories =  ctk.CTkComboBox(self.frame_page, values=["option 1", "option 2"],command=self.combobox_categories_callback(combobox_var))
         self.combobox_catégories.place(relx =0.6 ,rely =  0.45 , anchor = "center")
 
-
         self.label_creer_catégorie = ctk.CTkLabel(self.frame_page, text ="Créer une nouvelle catégorie:", text_color="black" , font=("Arial", 14, "bold"))
         self.label_creer_catégorie.place(relx =0.23 ,rely =  0.6 )
         self.entry_creer_catégorie = ctk.CTkEntry(self.frame_page, placeholder_text="Nom de votre catégorie")
         self.entry_creer_catégorie.place(relx = 0.51 , rely = 0.6)
 
-
-
         #bouton pour retourner à l'accueil
         from accueil import Accueil
-        self.button_accueil = ctk.CTkButton(self.frame_page, text = "Aller à l'ACCUEIL" , command = lambda: self.controlleur.changer_page( Accueil) , fg_color= "blue")
+        self.button_accueil = ctk.CTkButton(self.frame_page, text = "Aller à l'ACCUEIL" , command = lambda: self.controlleur.changer_page(Accueil) , fg_color= "blue")
         self.button_accueil.place(relx = 0.05 ,rely = 0.85)
 
-        #bouton pour passer a la prochaine étape
-        from Page_Choisir_Participants import Page_choisir_participants
-        self.bouton_choisir_participants = ctk.CTkButton(self.frame_page, text = "Choisir les participants" , command = lambda: self.controlleur.changer_page( Page_choisir_participants) , fg_color= "blue")
+        #bouton pour passer a la prochaine étape, choisir les participants
+        from Page_Creer_tournoi_Choisir_Participants import Page_Creer_tournoi_Choisir_Participants
+        self.bouton_choisir_participants = ctk.CTkButton(self.frame_page, text = "Choisir les participants" , command = lambda: self.controlleur.changer_page(Page_Creer_tournoi_Choisir_Participants) , fg_color= "blue")
         self.bouton_choisir_participants.place(relx = 0.8 ,rely = 0.85)
         
           

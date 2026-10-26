@@ -2,7 +2,7 @@ import pandas as pd
 import Participant
 from Participant import Participant
 
-class BanqueParticipant :
+class BanqueDeParticipant :
     def __init__(self, fichier) :
         self.banqueParticipant: list[Participant] = []
 
@@ -12,18 +12,21 @@ class BanqueParticipant :
         # mettre les participants comme objet Participant
         # du dataframe à la liste
         for _, row in participantDF.iterrows() :
-            id = row[0]
-            nom = row[1]
-            categorie = row[2]
-            nbTournoi = row[3]
-            victoire = row[4]
-            defaite = row[5]
-            nulle = row[6]
-            pointsPour = row[7]
-            pointsContre = row[8]
+            id = row['id']
+            nom = row['nom']
+            categorie = row['categorie']
+            nbTournoi = row['nbTournoi']
+            victoire = row['victoire']
+            defaite = row['defaite']
+            nulle = row['nulle']
+            pointsPour = row['pointsPour']
+            pointsContre = row['pointsContre']
+
             
             participantEnCours = Participant(id, nom, categorie,nbTournoi, victoire, defaite, nulle, pointsPour, pointsContre)
+            print(participantEnCours)   
             self.banqueParticipant.append(participantEnCours)
+            
 
     # obtenir une liste des joueurs selon leurs catégories
     def trierParticipantUneCategorie(self, categorie):

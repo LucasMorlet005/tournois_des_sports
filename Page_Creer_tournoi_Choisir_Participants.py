@@ -4,10 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
 
-
-
-
-class Page_choisir_participants(ctk.CTkFrame):
+class Page_Creer_tournoi_Choisir_Participants(ctk.CTkFrame):
     def __init__ (self, master=None , controlleur= None):
             super().__init__(master)
             self.master = master
