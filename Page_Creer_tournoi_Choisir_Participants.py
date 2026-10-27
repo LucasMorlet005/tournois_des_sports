@@ -13,7 +13,6 @@ class Page_Creer_tournoi_Choisir_Participants(ctk.CTkFrame):
 
 
     def combobox_participants_callback(self,choice):
-
          print(choice)
          return
          
