@@ -43,4 +43,10 @@ class BanqueDeParticipant :
             if participant.id == id :
                 return participant
 
+     # trouver un participant selon son nom
+    def rechercherParticipantNom(self, nom) :
+        for participant in self.banqueParticipant :
+            if participant.nom == nom :
+                return participant
+
         return None

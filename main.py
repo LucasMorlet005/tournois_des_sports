@@ -6,6 +6,7 @@ import numpy as np
 from accueil import Accueil
 from PIL import Image, ImageTk
 from BanqueDeParticipant import BanqueDeParticipant
+from Participant import Participant
 
 
 
@@ -17,8 +18,9 @@ class MainApp(ctk.CTk):
         self.title("TDS")  
         self.protocol("WM_DELETE_WINDOW", self.quit) # le protocole pour la fermeture safe
         self.page_actuelle = None   #Stocke la page visible à l'écran
-
         self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
+        self.participant_actuel = None
+        
 
         self.changer_page(Accueil)
 
@@ -28,8 +30,12 @@ class MainApp(ctk.CTk):
         if self.page_actuelle is not None:
             self.page_actuelle.destroy()
 
+        #créer la nouvelle page
         self.page_actuelle = classe_nouvelle_page(master = self, controlleur =self)
         self.page_actuelle.pack(fill="both", expand=True)
+
+
+  
              
 
 
