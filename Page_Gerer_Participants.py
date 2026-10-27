@@ -9,7 +9,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             super().__init__(master)
             self.master = master
             self.controlleur = controlleur 
-            self.participants = self.controlleur.mes_participants.banqueParticipant #juste pour avoir la liste avec un nom plus court, et puisqe 
+            self.participants = self.controlleur.mes_participants #juste pour avoir la liste avec un nom plus court, et puisqe 
             self.noms_participants = [p.nom for p in self.participants]  #la liste des nom pour la combobox des noms
             self.categories = list(set(p.categorie for p in self.participants)) # la liste des categories pour la combobox des categories
 
@@ -41,10 +41,9 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             #On split la varible en 2, le nom et la catégorie, pour n'utiliser que le prénom et le nom
         self.liste_participant_et_categorie = self.participant_choisi.split()
         nom_complet = self.liste_participant_et_categorie[0] + " " + self.liste_participant_et_categorie[1]
-        print(nom_complet)
             #on cherche le participant ayant le meme nom dans notre banque de participant, puis on met à jour le participant_actuel
-        self.controlleur.participant_actuel = self.controlleur.mes_participants.rechercherParticipantNom(nom_complet)
-        print(self.controlleur.participant_actuel.nom) 
+        self.controlleur.participant_actuel = self.participants.rechercherParticipantNom(nom_complet)
+   
 
 
 
@@ -169,7 +168,6 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
 
            #bouton pour voir les statistique du joueur choisi
-        #from Page_visualiser_statistiques_participant import page_visualiser_participant
         self.button_accueil = ctk.CTkButton(self.frame_page, text = "Voir les statistique\n du joueur choisi" , command = lambda: self.voir_statistiques_joueur(), fg_color= "green")
         self.button_accueil.place(relx = 0.85 ,rely = 0.85 ,anchor = "center")
 
@@ -183,5 +181,5 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
     def voir_statistiques_joueur(self):
          self.mettre_a_jour_participant_choisi()
-         from Page_visualiser_statistiques_participant import page_visualiser_participant
+         from Page_statistiques_participant import page_visualiser_participant
          self.controlleur.changer_page( page_visualiser_participant)
