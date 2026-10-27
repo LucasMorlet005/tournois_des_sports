@@ -6,7 +6,10 @@ import numpy as np
 from accueil import Accueil
 from PIL import Image, ImageTk
 from BanqueDeParticipant import BanqueDeParticipant
+<<<<<<< HEAD
 from Participant import Participant
+=======
+>>>>>>> 1c1be6efe8d65486f94662064153c8f1cbacad77
 
 
 
@@ -21,6 +24,8 @@ class MainApp(ctk.CTk):
         self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
         self.participant_actuel = None
         
+
+        self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
 
         self.changer_page(Accueil)
 
