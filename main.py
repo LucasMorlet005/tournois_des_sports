@@ -6,10 +6,7 @@ import numpy as np
 from accueil import Accueil
 from PIL import Image, ImageTk
 from BanqueDeParticipant import BanqueDeParticipant
-<<<<<<< HEAD
-from Participant import Participant
-=======
->>>>>>> 1c1be6efe8d65486f94662064153c8f1cbacad77
+from BanqueTournois import BanqueTournois
 
 
 
@@ -26,6 +23,18 @@ class MainApp(ctk.CTk):
         
 
         self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
+
+        # Charger les tournois enregistres
+        self.mes_tournois = BanqueTournois("tournois.json")
+
+        # Conserver le tournoi actuellement selectionne
+        self.tournoi_actuel = None
+
+        # Conserver les informations pendant la creation
+        self.tournoi_en_creation = {}
+
+        # Chemin du fichier des participants
+        self.fichier_participants = "listesParticipants.csv"
 
         self.changer_page(Accueil)
 
