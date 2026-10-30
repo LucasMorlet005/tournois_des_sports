@@ -37,18 +37,13 @@ class Page_Creer_tournoi_Choisir_Participants(ctk.CTkFrame):
         self.label_sous_titre.place(relx =0.5 ,rely =  0.2 , anchor = "center")
 
 
-
+            #combobox choisir participants
         combobox_var = ctk.StringVar(value="option 2")
         self.label_choisir_participant = ctk.CTkLabel(self.frame_page, text ="Chosir parmis ceux\n déjà enregistrés:", text_color="black" , font=("Arial", 14, "bold"))
         self.label_choisir_participant.place(relx =0.3 ,rely =  0.45 , anchor = "center")
         self.combobox_participants =  ctk.CTkComboBox(self.frame_page, values=["option 1", "option 2"],command=self.combobox_participants_callback(combobox_var))
         self.combobox_participants.place(relx =0.5 ,rely =  0.45 , anchor = "center")
 
-
-        self.label_creer_participant = ctk.CTkLabel(self.frame_page, text ="Créer un nouveau participant:", text_color="black" , font=("Arial", 14, "bold"))
-        self.label_creer_participant.place(relx =0.13 ,rely =  0.6 )
-        self.entry_creer_participant = ctk.CTkEntry(self.frame_page, placeholder_text="Nom du participant")
-        self.entry_creer_participant.place(relx = 0.41 , rely = 0.6)
 
 
 

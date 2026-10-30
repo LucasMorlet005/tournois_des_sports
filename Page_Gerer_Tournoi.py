@@ -50,7 +50,7 @@ class Page_Rechercher_Tournoi(ctk.CTkFrame):
 
         self.actualiser()
 
-    # Mettre a jour les tournois affiches selon la recherche
+    # Mettre a jour les tournois affichés selon la recherche
     def actualiser(self):
         for widget in self.zone.winfo_children():
             widget.destroy()

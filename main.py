@@ -8,6 +8,9 @@ from PIL import Image, ImageTk
 from BanqueDeParticipant import BanqueDeParticipant
 from Participant import Participant
 import pandas as pd
+from BanqueTournois import BanqueTournois
+
+
 
 
 
@@ -22,9 +25,6 @@ class MainApp(ctk.CTk):
         self.page_actuelle = None   #Stocke la page visible à l'écran
         self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
         self.participant_actuel = None
-        
-
-        self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
 
         # Charger les tournois enregistres
         self.mes_tournois = BanqueTournois("tournois.json")
