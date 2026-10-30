@@ -24,6 +24,20 @@ class MainApp(ctk.CTk):
         self.participant_actuel = None
         
 
+        self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
+
+        # Charger les tournois enregistres
+        self.mes_tournois = BanqueTournois("tournois.json")
+
+        # Conserver le tournoi actuellement selectionne
+        self.tournoi_actuel = None
+
+        # Conserver les informations pendant la creation
+        self.tournoi_en_creation = {}
+
+        # Chemin du fichier des participants
+        self.fichier_participants = "listesParticipants.csv"
+
         self.changer_page(Accueil)
 
     def changer_page(self, classe_nouvelle_page):

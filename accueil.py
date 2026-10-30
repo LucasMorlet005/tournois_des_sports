@@ -41,5 +41,18 @@ class Accueil(ctk.CTkFrame):
 
         # bouton pour aller à la page gérer les joueurs
         from Page_Gerer_Participants import Page_Gerer_Participants
-        self.button_aller_page_participant = ctk.CTkButton(self.frame_page, text="Gérer les joueurs", command=lambda: self.controlleur.changer_page(Page_Gerer_Participants))
-        self.button_aller_page_participant.place(relx = 0.1, rely = 0.7)
+        button_aller_page_participant = ctk.CTkButton(frame_page, text="Gérer les joueurs", command=lambda: self.controlleur.changer_page(Page_Gerer_Participants))
+        button_aller_page_participant.place(relx = 0.1, rely = 0.7)
+
+        # Importer la page pour rechercher les tournois existants
+        from Page_Gerer_Tournoi import Page_Rechercher_Tournoi
+
+        # Bouton pour consulter les tournois enregistres
+        button_tournois = ctk.CTkButton(
+            frame_page,
+            text="Tournois",
+            command=lambda: self.controlleur.changer_page(
+                Page_Rechercher_Tournoi
+            )
+        )
+        button_tournois.place(relx=0.75, rely=0.85)
