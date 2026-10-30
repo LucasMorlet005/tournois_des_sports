@@ -9,14 +9,14 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             super().__init__(master)
             self.master = master
             self.controlleur = controlleur 
-            self.participants = self.controlleur.mes_participants #juste pour avoir la liste avec un nom plus court, et puisqe 
+            self.participants = self.controlleur.mes_participants.banqueParticipant #juste pour avoir la liste avec un nom plus court
             self.noms_participants = [p.nom for p in self.participants]  #la liste des nom pour la combobox des noms
             self.categories = list(set(p.categorie for p in self.participants)) # la liste des categories pour la combobox des categories
 
             #dictionnaire pour la combobox des noms et categorie
             self.recherche_combine_dict = {participant.nom : participant.categorie for participant in self.participants} 
              #liste pour la combobox des noms et categorie
-            self.valeurs_recherche_combinee =  self.transformer_dictionnaire_en_liste(self.recherche_combine_dict,5)
+            self.valeurs_recherche_combinee =  self.transformer_dictionnaire_en_liste(self.recherche_combine_dict)
 
             #variable qui est la valeur entrée dans la combobox de noms , mise ici pour que toutes les fonctions y ai accès
             self.recherche_nom = tk.StringVar()
@@ -38,19 +38,21 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             from accueil import Accueil
             self.controlleur.changer_page( Accueil)
 
-            #On split la varible en 2, le nom et la catégorie, pour n'utiliser que le prénom et le nom
-        self.liste_participant_et_categorie = self.participant_choisi.split()
-        nom_complet = self.liste_participant_et_categorie[0] + " " + self.liste_participant_et_categorie[1]
+            #On split la varible en 2, le nom et la catégorie, pour n'utiliser que le nom complet
+        self.liste_participant_et_categorie = self.participant_choisi.split(" | ")
+
+
+        nom_complet = self.liste_participant_et_categorie[0]
             #on cherche le participant ayant le meme nom dans notre banque de participant, puis on met à jour le participant_actuel
-        self.controlleur.participant_actuel = self.participants.rechercherParticipantNom(nom_complet)
+        self.controlleur.participant_actuel = self.controlleur.mes_participants.rechercherParticipantNom(nom_complet)
    
 
 
 
             #fonction pour transformer un dicitonnaire en liste pour l'affichage de la combobox qui combine le nom et la categorie
-    def transformer_dictionnaire_en_liste(self,dictionnaire, nbr_espaces): 
-        espaces = nbr_espaces * " "
-        return [ f"{a}{espaces}{b}"   for a , b in dictionnaire.items() ]
+    def transformer_dictionnaire_en_liste(self,dictionnaire): 
+
+        return [ f"{a} | {b}"   for a , b in dictionnaire.items() ]
     
 
 
@@ -98,7 +100,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
             # On transforme le dictionnaire filtré en liste pour l.affichage
         self.nouvelle_liste_recherche_combine = self.transformer_dictionnaire_en_liste(
-            self.nouveau_dictionnaire_recherche_combine, 5
+            self.nouveau_dictionnaire_recherche_combine
         )
 
             #On met à jour la combobox 
@@ -139,31 +141,31 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
         #label pour la recherche par la catégorie
         self.label_recherche_categorie = ctk.CTkLabel(self.frame_page, text = "Rechercher par catégorie:" , text_color="black" , font=("Arial", 15, "bold"))
-        self.label_recherche_categorie.place(relx = 0.5, rely=0.45, anchor = "center")
+        self.label_recherche_categorie.place(relx = 0.48, rely=0.45, anchor = "center")
 
         #combobox pour la recherche par la categorie
             #apelle la fonction qui met à jour la combobox quand l'entrée de l'utilisateur est modifié
         self.recherche_categorie.trace_add("write", self.uptade_liste_categories) #non il ne faut pas mettre de parenthèse à self.uptade_liste_categories, demande pas pourquoi
             #combobox des catégories 
         self.liste_categorie_combobox = ctk.CTkComboBox(self.frame_page, values = self.categories, variable = self.recherche_categorie , height = 35 , width= 175)
-        self.liste_categorie_combobox.place(relx = 0.5, rely = 0.55, anchor = "center")
+        self.liste_categorie_combobox.place(relx = 0.48, rely = 0.55, anchor = "center")
 
 
 
          #label pour la combobox qui combine les 2 recherches
         self.label_recherche_combine = ctk.CTkLabel(self.frame_page, text = "Résultats de vos recherches:\n Nom       Catégorie" , text_color="black" , font=("Arial", 15, "bold"))
-        self.label_recherche_combine.place(relx = 0.82, rely=0.45, anchor = "center")
+        self.label_recherche_combine.place(relx = 0.8, rely=0.45, anchor = "center")
         
 
          #combobox qui combine les résultats des 2 autres combobox
             #ici on a pas de variable pour l'entrée, car ce n'est pas nécessaire et cela ferait des conflits
-        self.recherche_combine_combobox = ctk.CTkComboBox(self.frame_page, values = self.valeurs_recherche_combinee , height = 35 , width= 175)
-        self.recherche_combine_combobox.place(relx = 0.82, rely = 0.55, anchor = "center")
+        self.recherche_combine_combobox = ctk.CTkComboBox(self.frame_page, values = self.valeurs_recherche_combinee , height = 35 , width= 200)
+        self.recherche_combine_combobox.place(relx = 0.8, rely = 0.55, anchor = "center")
         
 
-          #bouton pour créer un joueur
-        #from 
-        self.button_accueil = ctk.CTkButton(self.frame_page, text = "Créer un joueur" , command = lambda: self.controlleur.changer_page( Accueil) , fg_color= "indigo")
+          #bouton pour créer un participant
+        from Page_creer_un_participant import page_creer_participant
+        self.button_accueil = ctk.CTkButton(self.frame_page, text = "Créer un joueur" , command = lambda: self.controlleur.changer_page( page_creer_participant) , fg_color= "indigo")
         self.button_accueil.place(relx = 0.5 ,rely = 0.85 ,anchor = "center" )
 
 
@@ -181,5 +183,5 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
     def voir_statistiques_joueur(self):
          self.mettre_a_jour_participant_choisi()
-         from Page_statistiques_participant import page_visualiser_participant
-         self.controlleur.changer_page( page_visualiser_participant)
+         from Page_visualiser_participant import page_visualiser_participant
+         self.controlleur.changer_page(page_visualiser_participant)

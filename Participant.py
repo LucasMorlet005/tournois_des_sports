@@ -13,6 +13,9 @@ class Participant :
         return self.points[0] - self.points[1]
 
     def calculerPourcentageVictoire(self) :
+
+        if self.fiche[0] == 0 and self.fiche[1] == 0 and self.fiche[2] == 0:
+            return 0
         # une victoire vaut 2 points, une égalité 1 et une défaite aucun.
         # le pourcentage de victoire est le ratio de points sur
         # la possibilité totale de points (2 par  matchs)
