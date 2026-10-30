@@ -6,6 +6,7 @@ class BanqueDeParticipant :
     def __init__(self, fichier) :
         self.banqueParticipant: list[Participant] = []
 
+
         # passer les participants d'un csv à un framework
         participantDF = pd.read_csv(fichier)
 
@@ -49,4 +50,21 @@ class BanqueDeParticipant :
             if participant.nom == nom :
                 return participant
 
-        return None
+     # créer un participant
+    def creerParticipant(self,id,nom,categorie,liste):
+        participantEnCours = Participant(id, nom, categorie,0, 0, 0,0, 0,0)
+        print(participantEnCours.nom)
+        liste.append(participantEnCours)
+
+
+    def sauvegarder(self,fichier,controlleur):
+         # 1. Convertit chaque objet Participant en dictionnaire à l'aide de __dict__
+        liste_dicts = [
+            self.controlleur.participants.banqueParticipant.__dict__ for participant in BanqueDeParticipant.self.banqueParticipant
+        ]
+
+        # 2. Crée le DataFrame à partir de cette liste
+        df_modifie = pd.DataFrame(liste_dicts)
+
+        # 3. Réécrit le fichier proprement (écrase l'ancien contenu)
+        df_modifie.to_csv(fichier, index=False, sep=",")
