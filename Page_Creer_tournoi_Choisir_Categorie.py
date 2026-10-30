@@ -1,63 +1,141 @@
 import customtkinter as ctk
-import tkinter as tk
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from PIL import Image, ImageTk
-
-
+from tkinter import messagebox
+from PIL import Image
 
 
 class Page_Creer_tournoi_Choisir_Categorie(ctk.CTkFrame):
-    def __init__ (self, master=None , controlleur= None):
-            super().__init__(master)
-            self.master = master
-            self.controlleur = controlleur 
-            self.show_page()
 
+    # Initialiser la page de selection de categorie
+    def __init__(self, master=None, controlleur=None):
+        super().__init__(master, fg_color="white")
+        self.controlleur = controlleur
+        self.show_page()
 
-
-    def combobox_categories_callback(self,choice):
-         print(choice)
-         return
-         
-
+    # Afficher les elements de la page
     def show_page(self):
+        self.frame_page = ctk.CTkFrame(
+            self, width=768, height=432, fg_color="white"
+        )
+        self.frame_page.place(x=0, y=0)
 
-        self.frame_page = ctk.CTkFrame(self, width = 768 , height = 432, fg_color = "white")
-        self.frame_page.place(x=0 , y=0 )
+        # Afficher le logo de l'application
+        image = Image.open("images/logo.jpg")
 
-        #Le logo en haut à gauche
-        image_pil = Image.open("images/logo.jpg")
-        self.bg_image = ctk.CTkImage(light_image=image_pil, dark_image=image_pil, size=(84, 72))
-        self.label_logo = ctk.CTkLabel(self.frame_page, text="", image = self.bg_image )
-        self.label_logo.place(relx=0.05, rely=0.05)
-        
-        #titre de la page : creer un tournoi
-        self.label_titre_page = ctk.CTkLabel(self.frame_page, text ="Création d'un tournois",text_color="black" , font=("Arial", 20, "bold"))
-        self.label_titre_page.place(relx =0.5 ,rely =  0.1 , anchor = "center")
+        self.logo = ctk.CTkImage(
+            light_image=image,
+            dark_image=image,
+            size=(84, 72)
+        )
 
-        #sous-titre de la page : choisir la catégorie
-        self.label_sous_titre = ctk.CTkLabel(self.frame_page, text ="CHOISIR LA CATÉGORIE ", text_color="black" , font=("Arial", 12, "bold"))
-        self.label_sous_titre.place(relx =0.5 ,rely =  0.2 , anchor = "center")
+        ctk.CTkLabel(
+            self.frame_page,
+            text="",
+            image=self.logo
+        ).place(x=24, y=20)
 
+        # Afficher le titre
+        ctk.CTkLabel(
+            self.frame_page,
+            text="Création d'un tournoi",
+            font=("Arial", 21, "bold"),
+            text_color="black"
+        ).place(relx=0.5, rely=0.1, anchor="center")
 
-            #combobox choisir catégorie
-        combobox_var = ctk.StringVar(value="option 2")
-        self.label_choisir_catégories = ctk.CTkLabel(self.frame_page, text ="Chosir parmis ceux\n déjà enregistrés:", text_color="black" , font=("Arial", 14, "bold"))
-        self.label_choisir_catégories.place(relx =0.4 ,rely =  0.45 , anchor = "center")
-        self.combobox_catégories =  ctk.CTkComboBox(self.frame_page, values=["option 1", "option 2"],command=self.combobox_categories_callback(combobox_var))
-        self.combobox_catégories.place(relx =0.6 ,rely =  0.45 , anchor = "center")
+        ctk.CTkLabel(
+            self.frame_page,
+            text="PAGE A - CHOISIR LA CATÉGORIE",
+            text_color="black"
+        ).place(relx=0.5, rely=0.2, anchor="center")
 
-   
+        # Nom du tournoi
+        ctk.CTkLabel(
+            self.frame_page,
+            text="Nom du tournoi :",
+            text_color="black"
+        ).place(x=165, y=130)
 
-        #bouton pour retourner à l'accueil
+        self.nom = ctk.CTkEntry(
+            self.frame_page,
+            width=240,
+            placeholder_text="Nom du tournoi"
+        )
+        self.nom.place(x=355, y=130)
+
+        # Recuperer les categories des joueurs existants
+        categories = sorted({
+            str(p.categorie)
+            for p in self.controlleur.mes_participants.banqueParticipant
+        })
+
+        ctk.CTkLabel(
+            self.frame_page,
+            text="Catégorie existante :",
+            text_color="black"
+        ).place(x=165, y=195)
+
+        self.categorie = ctk.CTkComboBox(
+            self.frame_page,
+            values=categories or ["Aucune"],
+            width=240
+        )
+        self.categorie.place(x=355, y=195)
+
+        # Permettre la creation d'une nouvelle categorie
+        ctk.CTkLabel(
+            self.frame_page,
+            text="Nouvelle catégorie :",
+            text_color="black"
+        ).place(x=165, y=260)
+
+        self.nouvelle = ctk.CTkEntry(
+            self.frame_page,
+            width=240,
+            placeholder_text="Au besoin"
+        )
+        self.nouvelle.place(x=355, y=260)
+
         from accueil import Accueil
-        self.button_accueil = ctk.CTkButton(self.frame_page, text = "Aller à l'ACCUEIL" , command = lambda: self.controlleur.changer_page(Accueil) , fg_color= "blue")
-        self.button_accueil.place(relx = 0.05 ,rely = 0.85)
 
-        #bouton pour passer a la prochaine étape, choisir les participants
+        # Bouton pour retourner a l'accueil
+        ctk.CTkButton(
+            self.frame_page,
+            text="Accueil",
+            command=lambda: self.controlleur.changer_page(Accueil)
+        ).place(x=30, y=365)
+
+        # Bouton pour passer a la selection des participants
+        ctk.CTkButton(
+            self.frame_page,
+            text="Choisir les participants",
+            width=180,
+            command=self.suivant
+        ).place(x=555, y=365)
+
+    # Verifier les informations avant de continuer
+    def suivant(self):
+        nom = self.nom.get().strip()
+
+        # Prioriser la nouvelle categorie si elle est remplie
+        categorie = (
+            self.nouvelle.get().strip()
+            or self.categorie.get().strip()
+        )
+
+        if not nom or not categorie or categorie == "Aucune":
+            messagebox.showerror(
+                "Erreur",
+                "Entre un nom et une catégorie."
+            )
+            return
+
+        # Conserver les informations pour la page suivante
+        self.controlleur.tournoi_en_creation = {
+            "nom": nom,
+            "categorie": categorie
+        }
+
         from Page_Creer_tournoi_Choisir_Participants import Page_Creer_tournoi_Choisir_Participants
-        self.bouton_choisir_participants = ctk.CTkButton(self.frame_page, text = "Choisir les participants" , command = lambda: self.controlleur.changer_page(Page_Creer_tournoi_Choisir_Participants) , fg_color= "blue")
-        self.bouton_choisir_participants.place(relx = 0.8 ,rely = 0.85)
-        
-          
+
+        self.controlleur.changer_page(
+            Page_Creer_tournoi_Choisir_Participants
+        )
