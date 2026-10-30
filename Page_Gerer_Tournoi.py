@@ -1,44 +1,48 @@
-
 import customtkinter as ctk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
+# PAGE POUR RECHERCHER LES TOURNOIS EXISTANTS
 class Page_Rechercher_Tournoi(ctk.CTkFrame):
 
-    # Constructeur de la page de recherche
+    # Initialiser la page de recherche
     def __init__(self, master=None, controlleur=None):
         super().__init__(master, fg_color="white")
+
         self.controlleur = controlleur
         self.show_page()
 
-    # Afficher la recherche et la liste des tournois
+    # Afficher la liste des tournois
     def show_page(self):
         ctk.CTkLabel(
             self,
             text="Tournois existants",
             font=("Arial", 22, "bold"),
             text_color="black"
-        ).pack(pady=18)
+        ).pack(pady=15)
 
+        # Champ pour rechercher un tournoi
         self.recherche = ctk.CTkEntry(
             self,
-            width=350,
-            placeholder_text="Rechercher par nom ou catégorie"
+            width=360,
+            placeholder_text="Nom ou catégorie"
         )
-        self.recherche.pack(pady=8)
+        self.recherche.pack(pady=7)
 
-        # Actualiser la recherche quand l'utilisateur tape
+        # Actualiser les resultats pendant la saisie
         self.recherche.bind(
             "<KeyRelease>",
             lambda event: self.actualiser()
         )
 
         self.zone = ctk.CTkScrollableFrame(
-            self, width=550, height=235
+            self,
+            width=550,
+            height=245
         )
-        self.zone.pack(pady=8)
+        self.zone.pack(pady=7)
 
         from accueil import Accueil
 
@@ -50,41 +54,47 @@ class Page_Rechercher_Tournoi(ctk.CTkFrame):
 
         self.actualiser()
 
-    # Mettre a jour les tournois affichés selon la recherche
+    # Mettre a jour la liste des tournois trouves
     def actualiser(self):
         for widget in self.zone.winfo_children():
             widget.destroy()
 
-        tournois = self.controlleur.mes_tournois.rechercher(
+        resultats = self.controlleur.mes_tournois.rechercher(
             self.recherche.get()
         )
 
-        if not tournois:
+        if not resultats:
             ctk.CTkLabel(
                 self.zone,
-                text="Aucun tournoi trouvé"
+                text="Aucun tournoi trouvé."
             ).pack(pady=10)
 
-        for tournoi in tournois:
+        # Creer un bouton pour chaque tournoi trouve
+        for tournoi in resultats:
             ctk.CTkButton(
                 self.zone,
-                width=500,
+                width=510,
                 text=(
-                    f"{tournoi['nom']} | {tournoi['categorie']} | "
+                    f"{tournoi['nom']} - "
+                    f"{tournoi['categorie']} - "
                     f"Ronde {len(tournoi['rondes'])}"
                 ),
                 command=lambda t=tournoi: self.ouvrir(t)
-            ).pack(pady=5)
+            ).pack(pady=4)
 
-    # Ouvrir un tournoi deja enregistre
+    # Ouvrir le tournoi selectionne
     def ouvrir(self, tournoi):
         self.controlleur.tournoi_actuel = tournoi
-        self.controlleur.changer_page(Page_Gerer_Tournoi)
+
+        self.controlleur.changer_page(
+            Page_Gerer_Tournoi
+        )
 
 
+# PAGE POUR GERER LES MATCHS ET LES RONDES SUISSES
 class Page_Gerer_Tournoi(ctk.CTkFrame):
 
-    # Constructeur de la page de gestion du tournoi
+    # Initialiser la page de gestion
     def __init__(self, master=None, controlleur=None):
         super().__init__(master, fg_color="white")
 
@@ -93,65 +103,72 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
 
         self.show_page()
 
-    # Retrouver le nom d'un joueur a partir de son identifiant
+    # Retrouver le nom d'un joueur avec son ID
     def nom_joueur(self, pid):
         if pid is None:
             return "REPOS"
 
-        for p in self.controlleur.mes_participants.banqueParticipant:
-            if int(p.id) == int(pid):
-                return p.nom
+        banque = self.controlleur.mes_participants.banqueParticipant
 
-        return f"Joueur {pid}"
+        for joueur in banque:
+            if int(joueur.id) == int(pid):
+                return joueur.nom
 
-    # Construire les onglets de matchs, classement et graphique
+        return f"Joueur #{pid}"
+
+    # Afficher la page avec les matchs, le classement et le graphique
     def show_page(self):
+        # Supprimer les anciens elements avant de les reconstruire
         for widget in self.winfo_children():
             widget.destroy()
 
-        banque = self.controlleur.mes_tournois
         tournoi = self.tournoi
+        banque = self.controlleur.mes_tournois
 
         ctk.CTkLabel(
             self,
             text=tournoi["nom"],
-            font=("Arial", 21, "bold"),
+            font=("Arial", 20, "bold"),
             text_color="black"
-        ).pack(pady=(8, 2))
+        ).pack(pady=(5, 0))
 
         ctk.CTkLabel(
             self,
             text=(
-                f"{tournoi['categorie']} | "
+                f"{tournoi['categorie']} - "
                 f"Ronde {len(tournoi['rondes'])}/{tournoi['nbRondes']}"
             ),
             text_color="black"
         ).pack()
 
+        # Creer trois onglets
         onglets = ctk.CTkTabview(
-            self, width=725, height=280
+            self,
+            width=730,
+            height=288
         )
-        onglets.pack(pady=5)
+        onglets.pack(pady=3)
 
         onglets.add("Matchs")
         onglets.add("Classement")
         onglets.add("Graphique")
 
-        # Afficher les matchs de la ronde en cours
-        zone_matchs = ctk.CTkScrollableFrame(
+        # ONGLET MATCHS
+        zone = ctk.CTkScrollableFrame(
             onglets.tab("Matchs")
         )
-        zone_matchs.pack(fill="both", expand=True)
+        zone.pack(fill="both", expand=True)
 
         if not tournoi["rondes"]:
             ctk.CTkLabel(
-                zone_matchs,
+                zone,
                 text="Aucune ronde commencée."
-            ).pack(pady=10)
+            ).pack()
 
         else:
+            # Afficher tous les matchs de la ronde actuelle
             for indice, match in enumerate(tournoi["rondes"][-1]):
-                ligne = ctk.CTkFrame(zone_matchs)
+                ligne = ctk.CTkFrame(zone)
                 ligne.pack(fill="x", pady=3)
 
                 joueur1 = self.nom_joueur(match["a"])
@@ -163,15 +180,16 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                     width=300
                 ).pack(side="left", padx=5)
 
-                # Un repos ne demande aucun resultat
+                # Donner 2 points automatiquement pour un repos
                 if match["b"] is None:
                     ctk.CTkLabel(
-                        ligne, text="+2 points"
+                        ligne,
+                        text="+2 points"
                     ).pack(side="left")
                     continue
 
-                # Convertir le resultat sauvegarde en texte
-                choix = {
+                # Choix des resultats possibles
+                options = {
                     None: "À jouer",
                     "A": "Victoire joueur 1",
                     "B": "Victoire joueur 2",
@@ -180,15 +198,12 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
 
                 combo = ctk.CTkComboBox(
                     ligne,
-                    values=[
-                        "À jouer",
-                        "Victoire joueur 1",
-                        "Victoire joueur 2",
-                        "Match nul"
-                    ],
+                    values=list(options.values()),
                     width=165
                 )
-                combo.set(choix[match["resultat"]])
+
+                # Afficher le resultat deja sauvegarde
+                combo.set(options[match["resultat"]])
                 combo.pack(side="left", padx=5)
 
                 ctk.CTkButton(
@@ -200,7 +215,7 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                     )
                 ).pack(side="left")
 
-        # Recuperer le classement calcule par la banque
+        # ONGLET CLASSEMENT
         classement = banque.classement(tournoi)
 
         zone_classement = ctk.CTkScrollableFrame(
@@ -208,21 +223,24 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
         )
         zone_classement.pack(fill="both", expand=True)
 
-        for _, joueur in classement.iterrows():
+        # Afficher le classement calcule par Pandas
+        for rang, (_, joueur) in enumerate(classement.iterrows(), 1):
             ctk.CTkLabel(
                 zone_classement,
                 text=(
-                    f"{int(joueur['Rang'])}. "
-                    f"{self.nom_joueur(joueur['ID'])} | "
-                    f"{int(joueur['Points'])} pts | "
-                    f"{int(joueur['Victoires'])}V "
-                    f"{int(joueur['Nulles'])}N "
-                    f"{int(joueur['Defaites'])}D | "
-                    f"Buchholz : {int(joueur['Buchholz'])}"
+                    f"{rang}. {self.nom_joueur(joueur['ID'])} | "
+                    f"{joueur['Points']} pts | "
+                    f"{joueur['V']}V "
+                    f"{joueur['N']}N "
+                    f"{joueur['D']}D | "
+                    f"Buchholz {joueur['Buchholz']}"
                 )
             ).pack(anchor="w", pady=3)
 
-        # Creer un graphique avec Matplotlib a partir du DataFrame
+        # ONGLET GRAPHIQUE
+        # Creer un graphique a partir du classement Pandas
+        figure, axe = plt.subplots(figsize=(6, 2.4))
+
         noms = [
             self.nom_joueur(pid)
             for pid in classement["ID"]
@@ -230,31 +248,42 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
 
         points = classement["Points"].tolist()
 
-        figure, axe = plt.subplots(figsize=(6, 2.5))
-        axe.barh(noms[::-1], points[::-1])
+        axe.barh(
+            noms[::-1],
+            points[::-1]
+        )
+
         axe.set_xlabel("Points")
         axe.set_title("Classement du tournoi")
+
         figure.tight_layout()
 
-        canvas = FigureCanvasTkAgg(
+        # Integrer le graphique Matplotlib dans CustomTkinter
+        graphique = FigureCanvasTkAgg(
             figure,
             master=onglets.tab("Graphique")
         )
-        canvas.draw()
-        canvas.get_tk_widget().pack(
-            fill="both", expand=True
+
+        graphique.draw()
+
+        graphique.get_tk_widget().pack(
+            fill="both",
+            expand=True
         )
 
         plt.close(figure)
 
-         # Boutons de navigation
-        boutons = ctk.CTkFrame(self, fg_color="white")
-        boutons.pack(pady=6)
+        # BOUTONS DE NAVIGATION
+        boutons = ctk.CTkFrame(
+            self,
+            fg_color="white"
+        )
+        boutons.pack(pady=5)
 
         ctk.CTkButton(
             boutons,
             text="Retour aux tournois",
-            width=165,
+            width=160,
             command=lambda: self.controlleur.changer_page(
                 Page_Rechercher_Tournoi
             )
@@ -263,11 +292,11 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
         ctk.CTkButton(
             boutons,
             text="Ronde suivante",
-            width=165,
+            width=150,
             command=self.prochaine_ronde
         ).pack(side="left", padx=10)
 
-     # Enregistrer le resultat choisi pour un match
+    # Enregistrer le resultat d'un match
     def resultat(self, indice, choix):
         codes = {
             "À jouer": None,
@@ -283,22 +312,26 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                 codes[choix]
             )
 
-            # Actualiser les points et le classement
+            # Actualiser les statistiques et le classement
             self.show_page()
 
         except (ValueError, KeyError) as erreur:
-            messagebox.showerror("Erreur", str(erreur))
+            messagebox.showerror(
+                "Erreur",
+                str(erreur)
+            )
 
-     # Generer la ronde suivante si tous les matchs sont termines
+    # Generer la prochaine ronde quand tous les matchs sont termines
     def prochaine_ronde(self):
         try:
             self.controlleur.mes_tournois.prochaine_ronde(
                 self.tournoi
             )
+
             self.show_page()
 
         except ValueError as erreur:
-            messagebox.showinfo("Tournoi", str(erreur))
-
-
-                    
+            messagebox.showinfo(
+                "Tournoi",
+                str(erreur)
+            )
