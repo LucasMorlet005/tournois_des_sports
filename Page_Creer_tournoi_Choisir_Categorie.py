@@ -40,16 +40,15 @@ class Page_Creer_tournoi_Choisir_Categorie(ctk.CTkFrame):
         self.label_sous_titre = ctk.CTkLabel(self.frame_page, text ="CHOISIR LA CATÉGORIE ", text_color="black" , font=("Arial", 12, "bold"))
         self.label_sous_titre.place(relx =0.5 ,rely =  0.2 , anchor = "center")
 
+
+            #combobox choisir catégorie
         combobox_var = ctk.StringVar(value="option 2")
         self.label_choisir_catégories = ctk.CTkLabel(self.frame_page, text ="Chosir parmis ceux\n déjà enregistrés:", text_color="black" , font=("Arial", 14, "bold"))
         self.label_choisir_catégories.place(relx =0.4 ,rely =  0.45 , anchor = "center")
         self.combobox_catégories =  ctk.CTkComboBox(self.frame_page, values=["option 1", "option 2"],command=self.combobox_categories_callback(combobox_var))
         self.combobox_catégories.place(relx =0.6 ,rely =  0.45 , anchor = "center")
 
-        self.label_creer_catégorie = ctk.CTkLabel(self.frame_page, text ="Créer une nouvelle catégorie:", text_color="black" , font=("Arial", 14, "bold"))
-        self.label_creer_catégorie.place(relx =0.23 ,rely =  0.6 )
-        self.entry_creer_catégorie = ctk.CTkEntry(self.frame_page, placeholder_text="Nom de votre catégorie")
-        self.entry_creer_catégorie.place(relx = 0.51 , rely = 0.6)
+   
 
         #bouton pour retourner à l'accueil
         from accueil import Accueil
