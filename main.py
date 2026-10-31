@@ -11,11 +11,6 @@ import pandas as pd
 from BanqueTournois import BanqueTournois
 
 
-
-
-
-
-
 class MainApp(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -26,8 +21,8 @@ class MainApp(ctk.CTk):
         self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
         self.participant_actuel = None
 
-        # Charger les tournois enregistres
-        self.mes_tournois = BanqueTournois("tournois.json")
+        # Charger les tournois et leurs matchs depuis les fichiers CSV
+        self.mes_tournois = BanqueTournois("tournois.csv", "matchs.csv")
 
         # Conserver le tournoi actuellement selectionne
         self.tournoi_actuel = None
