@@ -2,6 +2,7 @@ import customtkinter as ctk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from accueil import Accueil
 
 
 # PAGE POUR RECHERCHER LES TOURNOIS EXISTANTS
@@ -43,8 +44,6 @@ class Page_Rechercher_Tournoi(ctk.CTkFrame):
             height=245
         )
         self.zone.pack(pady=7)
-
-        from accueil import Accueil
 
         ctk.CTkButton(
             self,
@@ -101,6 +100,10 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
         self.controlleur = controlleur
         self.tournoi = controlleur.tournoi_actuel
 
+        #conserver les scores et les choix de matchs
+        self.saisies=[]
+
+
         self.show_page()
 
     # Retrouver le nom d'un joueur avec son ID
@@ -124,6 +127,9 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
 
         tournoi = self.tournoi
         banque = self.controlleur.mes_tournois
+
+        #reinitialiser les widgets de saisie
+        self.saisies = []
 
         ctk.CTkLabel(
             self,
@@ -174,20 +180,60 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                 joueur1 = self.nom_joueur(match["a"])
                 joueur2 = self.nom_joueur(match["b"])
 
+
+                #nom premier joueur
                 ctk.CTkLabel(
                     ligne,
-                    text=f"{joueur1} VS {joueur2}",
-                    width=300
-                ).pack(side="left", padx=5)
+                    text=joueur1,
+                    width=135
+                ).pack(side="left", padx=3)
 
                 # Donner 2 points automatiquement pour un repos
                 if match["b"] is None:
                     ctk.CTkLabel(
                         ligne,
-                        text="+2 points"
+                        text="Repos (+2 points)"
                     ).pack(side="left")
+
+                    self.saisies.append(None)
                     continue
 
+                #Point marque par premier joueur
+                score_a=ctk.CTkEntry(
+                    ligne,
+                    width=45,
+                    placeholder_text="Pts"
+                )
+                score_a.pack(side="left", padx=2)
+
+                #Afficher les anciens score si match enregeistre
+                if match.get("points_a") is not None:
+                    score_a.insert(0, str(match["points_a"]))
+
+                ctk.CTkLabel(
+                    ligne,
+                    text=" - "
+                ).pack(side="left")
+
+
+                #Point marque par deuxieme joueur
+                score_b=ctk.CTkEntry(
+                    ligne,
+                    width=45,
+                    placeholder_text="Pts"
+                )
+                score_b.pack(side="left", padx=2)
+
+                # Afficher les anciens score si match enregeistre
+                if match.get("points_b") is not None:
+                    score_b.insert(0, str(match["points_b"]))
+
+                # Nom 2ieme joueur
+                ctk.CTkLabel(
+                    ligne,
+                    text=joueur2,
+                    width=135
+                ).pack(side="left", padx=3)
                 # Choix des resultats possibles
                 options = {
                     None: "À jouer",
@@ -199,21 +245,16 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                 combo = ctk.CTkComboBox(
                     ligne,
                     values=list(options.values()),
-                    width=165
+                    width=150,
+                    state="readonly"
                 )
 
                 # Afficher le resultat deja sauvegarde
                 combo.set(options[match["resultat"]])
-                combo.pack(side="left", padx=5)
+                combo.pack(side="left", padx=3)
 
-                ctk.CTkButton(
-                    ligne,
-                    text="OK",
-                    width=45,
-                    command=lambda i=indice, c=combo: self.resultat(
-                        i, c.get()
-                    )
-                ).pack(side="left")
+                # Conserver widgets pour enregistrer la ronde
+                self.saisies.append((combo, score_a, score_b))  
 
         # ONGLET CLASSEMENT
         classement = banque.classement(tournoi)
@@ -289,15 +330,20 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
             )
         ).pack(side="left", padx=10)
 
+        #Enregistrer sans creer une nouvelle ronde a la derniere
+        derniere_ronde = (len(tournoi["rondes"]) >= tournoi["nbRondes"])
+
         ctk.CTkButton(
             boutons,
-            text="Ronde suivante",
-            width=150,
-            command=self.prochaine_ronde
+            text=("Enregistrer la ronde"
+                  if derniere_ronde 
+                  else "Ronde suivante"),
+            width=175,
+            command= self.prochaine_ronde
         ).pack(side="left", padx=10)
 
-    # Enregistrer le resultat d'un match
-    def resultat(self, indice, choix):
+    # Enregistrer les resultats de la ronde actuelle
+    def prochaine_ronde(self):
         codes = {
             "À jouer": None,
             "Victoire joueur 1": "A",
@@ -305,33 +351,44 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
             "Match nul": "N"
         }
 
+        resultats = []
+
+        #Recuperer les resultats de chaque match
+        for saisie in self.saisies:
+            if saisie is None:
+                   resultats.append(None)
+
+            else:
+                combo, score_a, score_b = saisie
+
+                resultats.append((
+                codes[combo.get()],
+                score_a.get(),
+                score_b.get()
+            ))
+
+        banque = self.controlleur.mes_tournois
+
         try:
-            self.controlleur.mes_tournois.enregistrer_resultat(
+            banque.enregistrer_ronde(
                 self.tournoi,
-                indice,
-                codes[choix]
+                resultats
             )
 
-            # Actualiser les statistiques et le classement
+            if len(self.tournoi["rondes"]) < self.tournoi["nbRondes"]:
+                banque.prochaine_ronde(self.tournoi)
+
+            else:
+                messagebox.showinfo(
+                    "Tournoi",
+                    "Derniere ronde enregistrée"
+                )
+
+
             self.show_page()
 
-        except (ValueError, KeyError) as erreur:
+        except ValueError as e:
             messagebox.showerror(
                 "Erreur",
-                str(erreur)
-            )
-
-    # Generer la prochaine ronde quand tous les matchs sont termines
-    def prochaine_ronde(self):
-        try:
-            self.controlleur.mes_tournois.prochaine_ronde(
-                self.tournoi
-            )
-
-            self.show_page()
-
-        except ValueError as erreur:
-            messagebox.showinfo(
-                "Tournoi",
-                str(erreur)
+                str(e)
             )
