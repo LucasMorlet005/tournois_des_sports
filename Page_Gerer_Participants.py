@@ -43,7 +43,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
 
         nom_complet = self.liste_participant_et_categorie[0]
-            #on cherche le participant ayant le meme nom dans notre banque de participant, puis on met à jour le participant_actuel
+            # on cherche le participant ayant le meme nom dans notre banque de participant, puis on met à jour le participant_actuel
         self.controlleur.participant_actuel = self.controlleur.mes_participants.rechercherParticipantNom(nom_complet)
    
 
