@@ -7,7 +7,7 @@ class BanqueTournois:
 
     # Colonnes utilisees dans les deux fichiers CSV
     COL_T = ["id", "nom", "categorie", "nbRondes", "participants"]
-    COL_M = ["tournoi_id", "ronde", "a", "b", "resultat"]
+    COL_M = ["tournoi_id", "ronde", "a", "b","resultat", "points_a", "points_b"]
 
     # Initialiser la banque et charger les tournois existants
     def __init__(self, fichier="tournois.csv", fichier_matchs="matchs.csv"):
@@ -18,13 +18,17 @@ class BanqueTournois:
 
     # Charger les informations des tournois et des matchs
     def charger(self):
-        if self.fichier.exists():
+        if self.fichier.exists() and self.fichier.stat().st_size > 0:
             df_t = pd.read_csv(self.fichier, dtype=str).fillna("")
         else:
             df_t = pd.DataFrame(columns=self.COL_T)
 
         if self.fichier_matchs.exists():
             df_m = pd.read_csv(self.fichier_matchs, dtype=str).fillna("")
+            # Permettre de lire les anciens CSV sans colonnes de scores
+            for colonne in ("points_a", "points_b"):
+                if colonne not in df_m.columns:
+                    df_m[colonne] = ""
         else:
             df_m = pd.DataFrame(columns=self.COL_M)
 
@@ -67,8 +71,9 @@ class BanqueTournois:
                     ronde.append({
                         "a": int(m["a"]),
                         "b": int(m["b"]) if m["b"] else None,
-                        "resultat": m["resultat"] or None
-                    })
+                        "resultat": m["resultat"] or None,
+                        "points_a": int(m["points_a"]) if m["points_a"] else None,
+                        "points_b": int(m["points_b"]) if m["points_b"] else None})
 
                 tournoi["rondes"].append(ronde)
 
@@ -98,7 +103,9 @@ class BanqueTournois:
                         "ronde": numero,
                         "a": match["a"],
                         "b": match["b"] if match["b"] is not None else "",
-                        "resultat": match["resultat"] or ""
+                        "resultat": match["resultat"] or "",
+                        "points_a": match.get("points_a") if match.get("points_a") is not None else "",
+                        "points_b": match.get("points_b") if match.get("points_b") is not None else ""
                     })
 
         pd.DataFrame(
@@ -293,7 +300,9 @@ class BanqueTournois:
             ronde.append({
                 "a": repos,
                 "b": None,
-                "resultat": "REPOS"
+                "resultat": "REPOS",
+                "points_a": None,
+                "points_b": None    
             })
 
         # Memoriser les confrontations precedentes
@@ -368,7 +377,9 @@ class BanqueTournois:
             ronde.append({
                 "a": a,
                 "b": b,
-                "resultat": None
+                "resultat": None,
+                "points_a": None,
+                "points_b": None
             })
 
         tournoi["rondes"].append(ronde)
@@ -391,3 +402,71 @@ class BanqueTournois:
 
         match["resultat"] = resultat
         self.sauvegarder()
+
+    # Valider et enregistrer tous les scores d'une ronde
+    def enregistrer_ronde(self, tournoi, resultats):
+        if not tournoi["rondes"]:
+            raise ValueError("Aucune ronde commencee.")
+
+        ronde = tournoi["rondes"][-1]
+
+        if len(resultats) != len(ronde):
+            raise ValueError("Resultats incomplets.")
+
+        validations = []
+
+        # Verifier tous les matchs avant de sauvegarder
+        for indice, (match, saisie) in enumerate(zip(ronde, resultats), 1):
+
+            # Les repos sont deja consideres comme termines
+            if match["b"] is None:
+                validations.append(("REPOS", None, None))
+                continue
+
+            resultat, texte_a, texte_b = saisie
+
+            if resultat not in ("A", "B", "N"):
+                raise ValueError(
+                    f"Match {indice} : choisis un resultat."
+                )
+
+            try:
+                points_a = int(texte_a)
+                points_b = int(texte_b)
+
+            except (ValueError, TypeError):
+                raise ValueError(
+                    f"Match {indice} : entre deux scores entiers."
+                )
+
+            if points_a < 0 or points_b < 0:
+                raise ValueError(
+                    f"Match {indice} : les scores doivent etre positifs."
+                )
+
+            # Le gagnant doit correspondre aux points marques
+            if resultat == "A" and points_a <= points_b:
+                raise ValueError(
+                    f"Match {indice} : le joueur 1 doit avoir plus de points."
+                )
+
+            if resultat == "B" and points_b <= points_a:
+                raise ValueError(
+                    f"Match {indice} : le joueur 2 doit avoir plus de points."
+                )
+
+            if resultat == "N" and points_a != points_b:
+                raise ValueError(
+                    f"Match {indice} : les scores doivent etre egaux."
+                )
+
+            validations.append((resultat, points_a, points_b))
+
+        # Enregistrer tous les matchs une fois les validations terminees
+        for match, (resultat, points_a, points_b) in zip(ronde, validations):
+            match["resultat"] = resultat
+            match["points_a"] = points_a
+            match["points_b"] = points_b
+
+        self.sauvegarder()
+
