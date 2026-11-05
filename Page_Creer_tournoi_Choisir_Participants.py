@@ -201,11 +201,11 @@ class Page_Creer_tournoi_Choisir_Participants(ctk.CTkFrame):
         for p in banque:
             if (
                 p.nom.casefold() == nom.casefold()
-                and str(p.categorie) == self.categorie
+                #and str(p.categorie) == self.categorie
             ):
                 messagebox.showerror(
                     "Erreur",
-                    "Ce joueur existe déjà dans cette catégorie."
+                    "Ce joueur existe déjà dans cette catégorie ou dans une autre categorie."
                 )
                 return
 

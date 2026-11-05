@@ -110,15 +110,16 @@ class page_creer_participant(ctk.CTkFrame):
                         messagebox.showerror("erreur","Tu dois entrer une categorie !")
                         return 0
 
+                
                 for caractere in self.nom:
-                        if not caractere.isalpha or not caractere.isalnum:
-                                messagebox.showerror("erreur","Nom d'utilisateur invalide, les caractères autre que les lettres et les chiffres sont interdits")
-                                return 0
+                        if  caractere == "|": 
+                                messagebox.showerror("erreur","Nom du participant invalide, le caractère ' | ' interdits")
+                                return 
 
                 for caractere in self.categorie:
-                        if not caractere.isalpha or not caractere.isalnum:
-                                messagebox.showerror("erreur","Catégorie invalide, les caractères autre que les lettres et les chiffres sont interdits")
-                                return 0
+                        if  caractere == "|":
+                                messagebox.showerror("erreur","Nom de categorie invalide, le caractère ' | ' interdits")
+                                return 
                         
                 
                 

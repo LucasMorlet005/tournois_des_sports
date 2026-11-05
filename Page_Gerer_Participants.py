@@ -65,7 +65,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             #fonction pour transformer un dicitonnaire en liste pour l'affichage de la combobox qui combine le nom et la categorie
     def transformer_dictionnaire_en_liste(self,dictionnaire): 
 
-        return ["Aucun joueur"] + [f"{a} | {b}"   for a , b in dictionnaire.items() ]
+        return ["Aucun joueur"] + [f"{a}  |  {b}"   for a , b in dictionnaire.items() ]
     
         
 
@@ -205,7 +205,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
 
          #label pour la combobox qui combine les 2 recherches
-        self.label_recherche_combine = ctk.CTkLabel(self.frame_page, text = "Résultats de vos recherches:\n Nom | Catégorie" , text_color="black" , font=("Arial", 15, "bold"))
+        self.label_recherche_combine = ctk.CTkLabel(self.frame_page, text = "Résultats de vos recherches:\n     Nom     |     Catégorie" , text_color="black" , font=("Arial", 15, "bold"))
         self.label_recherche_combine.place(relx = 0.8, rely=0.45, anchor = "center")
         
 

@@ -68,18 +68,36 @@ class Page_Rechercher_Tournoi(ctk.CTkFrame):
                 text="Aucun tournoi trouvé."
             ).pack(pady=10)
 
+            
+
         # Creer un bouton pour chaque tournoi trouve
         for tournoi in resultats:
-            ctk.CTkButton(
-                self.zone,
-                width=510,
-                text=(
-                    f"{tournoi['nom']} - "
-                    f"{tournoi['categorie']} - "
-                    f"Ronde {len(tournoi['rondes'])}"
-                ),
-                command=lambda t=tournoi: self.ouvrir(t)
-            ).pack(pady=4)
+
+            if tournoi['enCours']:
+                ctk.CTkButton(
+                    self.zone,
+                    width=510,
+                    text=(
+                        f"{tournoi['nom']} - "
+                        f"{tournoi['categorie']} - "
+                        f"Ronde {len(tournoi['rondes'])}"
+                    ),
+                    command=lambda t=tournoi: self.ouvrir(t)
+                    ).pack(pady=4)
+            else:
+
+
+
+                ctk.CTkButton(
+                    self.zone,
+                    width=510,
+                    text=(
+                        f"{tournoi['nom']} - "
+                        f"{tournoi['categorie']} - "
+                        "Terminé"
+                    ),
+                    command=lambda t=tournoi: self.ouvrir(t)
+                ).pack(pady=4)
 
     # Ouvrir le tournoi selectionne
     def ouvrir(self, tournoi):
@@ -171,20 +189,29 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                 text="Aucune ronde commencée."
             ).pack()
 
+        elif not self.tournoi["enCours"]:
+
+            ctk.CTkLabel(
+                zone,
+                text="LE TOURNOI EST TERMINÉ",
+                font=("Arial", 18, "bold"),
+                text_color="green"
+            ).pack(pady=20)
+            
         else:
             # Afficher tous les matchs de la ronde actuelle
             for indice, match in enumerate(tournoi["rondes"][-1]):
                 ligne = ctk.CTkFrame(zone)
                 ligne.pack(fill="x", pady=3)
 
-                joueur1 = self.nom_joueur(match["a"])
-                joueur2 = self.nom_joueur(match["b"])
+                self.joueur1 = self.nom_joueur(match["a"])
+                self.joueur2 = self.nom_joueur(match["b"])
 
 
                 #nom premier joueur
                 ctk.CTkLabel(
                     ligne,
-                    text=joueur1,
+                    text=self.joueur1,
                     width=135
                 ).pack(side="left", padx=3)
 
@@ -231,7 +258,7 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                 # Nom 2ieme joueur
                 ctk.CTkLabel(
                     ligne,
-                    text=joueur2,
+                    text=self.joueur2,
                     width=135
                 ).pack(side="left", padx=3)
                 # Choix des resultats possibles
@@ -244,17 +271,17 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
 
                 combo = ctk.CTkComboBox(
                     ligne,
-                    values=list(options.values()),
+                    values=["À jouer","Victoire de: " + self.joueur1, "Victoire de: " + self.joueur2, "Match nul"],
                     width=150,
                     state="readonly"
                 )
 
                 # Afficher le resultat deja sauvegarde
-                combo.set(options[match["resultat"]])
+                combo.set("À jouer")
                 combo.pack(side="left", padx=3)
 
                 # Conserver widgets pour enregistrer la ronde
-                self.saisies.append((combo, score_a, score_b))  
+                self.saisies.append((combo, score_a, score_b , self.joueur1 , self.joueur2))  
 
         # ONGLET CLASSEMENT
         classement = banque.classement(tournoi)
@@ -333,39 +360,52 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
         #Enregistrer sans creer une nouvelle ronde a la derniere
         derniere_ronde = (len(tournoi["rondes"]) >= tournoi["nbRondes"])
 
-        ctk.CTkButton(
-            boutons,
-            text=("Enregistrer la ronde"
-                  if derniere_ronde 
-                  else "Ronde suivante"),
-            width=175,
-            command= self.prochaine_ronde
-        ).pack(side="left", padx=10)
+            #Si le tournois est en cours on veut le bouton, sinon non
+        if tournoi["enCours"]:
+            self.bouton_enregistrer = ctk.CTkButton(
+                boutons,
+                text=("Enregistrer la ronde"
+                    if derniere_ronde 
+                    else "Ronde suivante"),
+                width=175,
+                command= self.prochaine_ronde
+            ).pack(side="left", padx=10)
 
     # Enregistrer les resultats de la ronde actuelle
     def prochaine_ronde(self):
-        codes = {
-            "À jouer": None,
-            "Victoire joueur 1": "A",
-            "Victoire joueur 2": "B",
-            "Match nul": "N"
-        }
 
-        resultats = []
+        resultats = list()
 
-        #Recuperer les resultats de chaque match
         for saisie in self.saisies:
             if saisie is None:
-                   resultats.append(None)
+                resultats.append(None)
 
             else:
-                combo, score_a, score_b = saisie
+                combo, score_a, score_b, self.joueur1, self.joueur2 = saisie
 
-                resultats.append((
-                codes[combo.get()],
-                score_a.get(),
-                score_b.get()
-            ))
+
+
+                
+                choix = combo.get()
+
+                if choix == "Victoire de: " + self.joueur1:
+                    self.resultat = "A"
+
+                elif choix == "Victoire de: " + self.joueur2:
+                    self.resultat = "B"
+
+                elif choix == "Match nul":
+                    self.resultat = "N"
+
+                else:
+                    self.resultat = None
+
+            
+            resultats.append((
+                    self.resultat,
+                    score_a.get(),
+                    score_b.get()
+                ))
 
         banque = self.controlleur.mes_tournois
 
@@ -375,14 +415,47 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                 resultats
             )
 
+                                    #mettre à jour les caractérisiques des joueurs
+                #on simplifit le chemin d'accès vers les participants
+            self.participant_1 = self.controlleur.mes_participants.rechercherParticipantNom(self.joueur1)
+            self.participant_2 = self.controlleur.mes_participants.rechercherParticipantNom(self.joueur2)
+
+                #On modifie les points gagnées pour les 2 participants
+            self.participant_1.points[0] += int(score_a.get())
+            self.participant_1.points[1] += int(score_b.get())
+
+                #On modifie les points contres pour les 2 participants
+            self.participant_2.points[0] += int(score_b.get())
+            self.participant_2.points[1] += int(score_a.get())
+
+                #Si le joueur 1 a gagné, on lui donne une victoire et on donne une défaite au participant 2
+            if self.resultat == "A":
+                self.participant_1.fiche[0] += 1
+                self.participant_2.fiche[1] += 1
+
+                  #Si le joueur 2 a gagné, on lui donne une victoire et on donne une défaite au participant 1
+            elif self.resultat == "B":
+                self.participant_2.fiche[0] += 1
+                self.participant_1.fiche[1] += 1
+
+                #Si c'est match nul, tout les 2 gagnent 1 défaite
+            elif self.resultat == "N":
+                self.participant_1.fiche[2] += 1
+                self.participant_2.fiche[2] += 1
+
+
             if len(self.tournoi["rondes"]) < self.tournoi["nbRondes"]:
                 banque.prochaine_ronde(self.tournoi)
+            
 
             else:
                 messagebox.showinfo(
                     "Tournoi",
                     "Derniere ronde enregistrée"
                 )
+                self.tournoi["enCours"] = False
+    
+
 
 
             self.show_page()
