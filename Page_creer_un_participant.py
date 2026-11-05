@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
 from BanqueDeParticipant import BanqueDeParticipant
+from tkinter import messagebox
 
 
 
@@ -92,20 +93,33 @@ class page_creer_participant(ctk.CTkFrame):
                 self.nom =  self.nom_entree.get()
                 self.categorie = self.recherche_categorie.get()
 
+                self.liste_noms = list()
+
+                for participant in self.controlleur.mes_participants.banqueParticipant:
+                        self.liste_noms.append(participant.nom)
+
+
+                if(self.nom in self.liste_noms):
+                        messagebox.showerror("erreur","Ce nom existe déjà")
+                        return 0
+
                 if(self.nom == ""):
-                        print("Tu dois entrer un nom !")
+                        messagebox.showerror("erreur","Tu dois entrer un nom !")
                         return 0
                 if(self.categorie == ""):
-                        print("Tu dois entrer une categorie !")
+                        messagebox.showerror("erreur","Tu dois entrer une categorie !")
                         return 0
 
-                if not self.nom.isalnum():
-                        print("Nom d'utilisateur invalide, les caractères autre que les lettres sont interdits")
-                        return 0
+                
+                for caractere in self.nom:
+                        if  caractere == "|": 
+                                messagebox.showerror("erreur","Nom du participant invalide, le caractère ' | ' interdits")
+                                return 
 
-                if not self.categorie.isalnum():
-                        print("Nom d'utilisateur invalide, les caractères autres que les lettres sont interdits")
-                        return 0
+                for caractere in self.categorie:
+                        if  caractere == "|":
+                                messagebox.showerror("erreur","Nom de categorie invalide, le caractère ' | ' interdits")
+                                return 
                         
                 
                 
@@ -113,5 +127,7 @@ class page_creer_participant(ctk.CTkFrame):
                 self.controlleur.mes_participants.creerParticipant(self.id,self.nom,self.categorie ,self.controlleur.mes_participants.banqueParticipant)
                 self.recherche_categorie.set("")
                 self.nom_entree.set("")
-                print("Votre participant a bien été créé !")
+
+                messagebox.showinfo("Réussi", "Votre participant a bien été créé")
+            
                 

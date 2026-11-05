@@ -6,7 +6,7 @@ import pandas as pd
 class BanqueTournois:
 
     # Colonnes utilisees dans les deux fichiers CSV
-    COL_T = ["id", "nom", "categorie", "nbRondes", "participants"]
+    COL_T = ["id", "nom", "categorie", "nbRondes", "participants" , "enCours"]
     COL_M = ["tournoi_id", "ronde", "a", "b","resultat", "points_a", "points_b"]
 
     # Initialiser la banque et charger les tournois existants
@@ -48,7 +48,8 @@ class BanqueTournois:
                 "categorie": ligne["categorie"],
                 "nbRondes": int(ligne["nbRondes"]),
                 "participants": participants,
-                "rondes": []
+                "rondes": [], 
+                "enCours": ligne["enCours"] == "True"
             }
 
             # Recuperer les matchs appartenant a ce tournoi
@@ -92,7 +93,8 @@ class BanqueTournois:
                 "nbRondes": tournoi["nbRondes"],
                 "participants": ";".join(
                     map(str, tournoi["participants"])
-                )
+                ),
+                "enCours": tournoi["enCours"]
             })
 
             # Enregistrer chaque match avec son numero de ronde
@@ -149,7 +151,8 @@ class BanqueTournois:
             "categorie": categorie,
             "participants": participants,
             "nbRondes": nbRondes,
-            "rondes": []
+            "rondes": [],
+            "enCours" : True
         }
 
         self.tournois.append(tournoi)

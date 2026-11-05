@@ -111,6 +111,8 @@ class Page_Creer_tournoi_Choisir_Categorie(ctk.CTkFrame):
             command=self.suivant
         ).place(x=555, y=365)
 
+
+
     # Verifier les informations avant de continuer
     def suivant(self):
         nom = self.nom.get().strip()
@@ -127,6 +129,16 @@ class Page_Creer_tournoi_Choisir_Categorie(ctk.CTkFrame):
                 "Entre un nom et une catégorie."
             )
             return
+
+        for tournois in self.controlleur.mes_tournois.tournois:
+            if nom == tournois["nom"]:
+                messagebox.showerror("erreur","Nom de tournois déjà utilisé")
+                return 
+
+        for c in categorie:
+            if  c == "|":
+                messagebox.showerror("erreur","Nom de categorie invalide, le caractère ' | ' interdits")
+                return 
 
         # Conserver les informations pour la page suivante
         self.controlleur.tournoi_en_creation = {

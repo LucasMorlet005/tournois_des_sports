@@ -18,7 +18,7 @@ class MainApp(ctk.CTk):
         self.geometry("768x432")
         self.title("TDS")  
         self.protocol("WM_DELETE_WINDOW", lambda: self.quit("listesParticipants.csv")) # le protocole pour la fermeture safe
-        self.page_actuelle = None   #Stocke la page visible à l'écran
+        self.page_actuelle = None   # la page visible à l'écran
         self.mes_participants = BanqueDeParticipant("listesParticipants.csv")
         self.participant_actuel = None
 
@@ -67,22 +67,11 @@ class MainApp(ctk.CTk):
         #  Crée le DataFrame à partir de cette liste
         df_modifie = pd.DataFrame(liste_dicts)
 
-        #  Réécrit le fichier proprement (écrase l'ancien contenu)
+        #  Réécrit le fichier 
         df_modifie.to_csv(fichier, index=False, sep=",")
 
         plt.close('all')
         self.destroy()
-
-
-    
-
-
-        
-
-
-  
-             
-
 
 
 if __name__ == "__main__":
