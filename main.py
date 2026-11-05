@@ -3,6 +3,7 @@ import customtkinter
 import customtkinter as ctk
 import tkinter as tk 
 import numpy as np
+import matplotlib.pyplot as plt
 from accueil import Accueil
 from PIL import Image, ImageTk
 from BanqueDeParticipant import BanqueDeParticipant
@@ -68,7 +69,8 @@ class MainApp(ctk.CTk):
 
         #  Réécrit le fichier 
         df_modifie.to_csv(fichier, index=False, sep=",")
-        
+
+        plt.close('all')
         self.destroy()
 
 
