@@ -35,7 +35,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
         
             #On split la varible en 2, le nom et la catégorie, pour n'utiliser que le nom complet
-        self.liste_participant_et_categorie = self.participant_choisi.split(" | ")
+        self.liste_participant_et_categorie = self.participant_choisi.split("  |  ")
 
             #On ne sort que le nom 
         self.nom_complet = self.liste_participant_et_categorie[0]
@@ -57,9 +57,10 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             else:
                 messagebox.showerror( "Erreur", "Entre le nom du joueur.")
                 return False
+            
+        messagebox.showerror( "Erreur", "Une erreur s'est produite")
+        return False
                  
-   
-
 
 
             #fonction pour transformer un dicitonnaire en liste pour l'affichage de la combobox qui combine le nom et la categorie

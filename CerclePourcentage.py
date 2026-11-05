@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class CerclePourcentage(ctk.CTkFrame):
-    def __init__(self, master, pourcentage=79.2, **kwargs):
+    def __init__(self, master, pourcentage=0, **kwargs):
         if 'corner_radius' not in kwargs:
             kwargs['corner_radius'] = 20
             

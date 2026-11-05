@@ -20,7 +20,7 @@ class Participant :
         # le pourcentage de victoire est le ratio de points sur
         # la possibilité totale de points (2 par  matchs)
 
-        return round((100 * (self.fiche[0] * 2 + self.fiche[1]) / (2 * (self.fiche[0] + self.fiche[1] + self.fiche[2]))), 1)
+        return round((100 * (self.fiche[0] * 2 + self.fiche[2]) / (2 * (self.fiche[0] + self.fiche[1] + self.fiche[2]))), 1)
 
     def __str__(self) :
         return f"{self.nom} : {self.calculerPourcentageVictoire()} % de victoire."
