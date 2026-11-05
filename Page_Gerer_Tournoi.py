@@ -58,11 +58,11 @@ class Page_Rechercher_Tournoi(ctk.CTkFrame):
         for widget in self.zone.winfo_children():
             widget.destroy()
 
-        resultats = self.controlleur.mes_tournois.rechercher(
+        self.resultats = self.controlleur.mes_tournois.rechercher(
             self.recherche.get()
         )
 
-        if not resultats:
+        if not self.resultats:
             ctk.CTkLabel(
                 self.zone,
                 text="Aucun tournoi trouvé."
@@ -71,7 +71,7 @@ class Page_Rechercher_Tournoi(ctk.CTkFrame):
             
 
         # Creer un bouton pour chaque tournoi trouve
-        for tournoi in resultats:
+        for tournoi in self.resultats:
 
             if tournoi['enCours']:
                 ctk.CTkButton(
@@ -374,18 +374,15 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
     # Enregistrer les resultats de la ronde actuelle
     def prochaine_ronde(self):
 
-        resultats = list()
+        self.resultats = list()
 
         for saisie in self.saisies:
             if saisie is None:
-                resultats.append(None)
+                self.resultats.append(None)
 
             else:
                 combo, score_a, score_b, self.joueur1, self.joueur2 = saisie
 
-
-
-                
                 choix = combo.get()
 
                 if choix == "Victoire de: " + self.joueur1:
@@ -401,7 +398,7 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                     self.resultat = None
 
             
-            resultats.append((
+                self.resultats.append((
                     self.resultat,
                     score_a.get(),
                     score_b.get()
@@ -412,36 +409,44 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
         try:
             banque.enregistrer_ronde(
                 self.tournoi,
-                resultats
+                self.resultats
             )
 
-                                    #mettre à jour les caractérisiques des joueurs
-                #on simplifit le chemin d'accès vers les participants
-            self.participant_1 = self.controlleur.mes_participants.rechercherParticipantNom(self.joueur1)
-            self.participant_2 = self.controlleur.mes_participants.rechercherParticipantNom(self.joueur2)
+            for index, saisie in enumerate(self.saisies):
+                if saisie is None:
+                    continue  # Ignorer les repos
 
-                #On modifie les points gagnées pour les 2 participants
-            self.participant_1.points[0] += int(score_a.get())
-            self.participant_1.points[1] += int(score_b.get())
+                combo, score_a, score_b, nom_j1, nom_j2 = saisie
+                res, s_a, s_b = self.resultats[index]
 
-                #On modifie les points contres pour les 2 participants
-            self.participant_2.points[0] += int(score_b.get())
-            self.participant_2.points[1] += int(score_a.get())
+                # Mettre à jour les caractéristiques des joueurs
+                self.participant_1 = self.controlleur.mes_participants.rechercherParticipantNom(nom_j1)
+                self.participant_2 = self.controlleur.mes_participants.rechercherParticipantNom(nom_j2)
 
-                #Si le joueur 1 a gagné, on lui donne une victoire et on donne une défaite au participant 2
-            if self.resultat == "A":
-                self.participant_1.fiche[0] += 1
-                self.participant_2.fiche[1] += 1
+                if not self.participant_1 or not self.participant_2:
+                    continue
 
-                  #Si le joueur 2 a gagné, on lui donne une victoire et on donne une défaite au participant 1
-            elif self.resultat == "B":
-                self.participant_2.fiche[0] += 1
-                self.participant_1.fiche[1] += 1
+                val_a = int(score_a.get()) if score_a.get() else 0
+                val_b = int(score_b.get()) if score_b.get() else 0
 
-                #Si c'est match nul, tout les 2 gagnent 1 défaite
-            elif self.resultat == "N":
-                self.participant_1.fiche[2] += 1
-                self.participant_2.fiche[2] += 1
+
+                # On modifie les points pour / points contre
+                self.participant_1.points[0] += val_a
+                self.participant_1.points[1] += val_b
+
+                self.participant_2.points[0] += val_b
+                self.participant_2.points[1] += val_a
+
+                # Utilisation correcte de 'res' (et non self.resultat)
+                if res == "A":
+                    self.participant_1.fiche[0] += 1  # Victoire J1
+                    self.participant_2.fiche[1] += 1  # Défaite J2
+                elif res == "B":
+                    self.participant_2.fiche[0] += 1  # Victoire J2
+                    self.participant_1.fiche[1] += 1  # Défaite J1
+                elif res == "N":
+                    self.participant_1.fiche[2] += 1  # Égalité J1
+                    self.participant_2.fiche[2] += 1  # Égalité J2
 
 
             if len(self.tournoi["rondes"]) < self.tournoi["nbRondes"]:
@@ -453,7 +458,24 @@ class Page_Gerer_Tournoi(ctk.CTkFrame):
                     "Tournoi",
                     "Derniere ronde enregistrée"
                 )
+
+                #On augmente le nomre de tournois joués
+                for index, saisie in enumerate(self.saisies):
+                    if saisie is None:
+                        continue  # Ignorer les repos
+
+                    combo, score_a, score_b, nom_j1, nom_j2 = saisie
+                    res, s_a, s_b = self.resultats[index]
+                    self.participant_1 = self.controlleur.mes_participants.rechercherParticipantNom(nom_j1)
+                    self.participant_2 = self.controlleur.mes_participants.rechercherParticipantNom(nom_j2)
+
+                    self.participant_1.nbTournoi += 1
+                    self.participant_2.nbTournoi += 1
+
+
+
                 self.tournoi["enCours"] = False
+
     
 
 
