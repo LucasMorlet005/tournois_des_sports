@@ -28,11 +28,6 @@ class Accueil(ctk.CTkFrame):
         self.label_fond = ctk.CTkLabel(self.frame_page, text="", image = self.bg_image)# Label
         self.label_fond.place(relx=0.3, rely=0.05)
 
-         #Le logo en haut à gauche
-        #image_pil = Image.open(images/logo.jpg")
-        self.image_logo = ctk.CTkImage(light_image=image_pil, dark_image=image_pil, size=(84, 72))
-        self.label_logo = ctk.CTkLabel(self.frame_page, text="", image = self.image_logo )
-        self.label_logo.place(relx=0.05, rely=0.05)
 
         #button pour aller à la page créer tournoi
         from Page_Creer_tournoi_Choisir_Categorie import Page_Creer_tournoi_Choisir_Categorie

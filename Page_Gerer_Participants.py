@@ -3,6 +3,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
+from tkinter import messagebox
 
 class Page_Gerer_Participants(ctk.CTkFrame):
     def __init__ (self, master=None , controlleur= None):
@@ -32,19 +33,31 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             #On prends par défaut le joueur dans la combobox combiné comme joueur sélectionné
         self.participant_choisi = self.recherche_combine_combobox.get()
 
-
-        if self.participant_choisi == "":
-            print("Aucun joueur n'a été selectionné")
-            from accueil import Accueil
-            self.controlleur.changer_page( Accueil)
-
+        
             #On split la varible en 2, le nom et la catégorie, pour n'utiliser que le nom complet
         self.liste_participant_et_categorie = self.participant_choisi.split(" | ")
 
+            #On ne sort que le nom 
+        self.nom_complet = self.liste_participant_et_categorie[0]
 
-        nom_complet = self.liste_participant_et_categorie[0]
-            #on cherche le participant ayant le meme nom dans notre banque de participant, puis on met à jour le participant_actuel
-        self.controlleur.participant_actuel = self.controlleur.mes_participants.rechercherParticipantNom(nom_complet)
+
+
+            #Si l'entrée du nom dans la combobox combiné est dans la liste de noms, on renvois le joueur avec ce nom
+        if self.nom_complet in self.noms_participants:
+            self.controlleur.participant_actuel = self.controlleur.mes_participants.rechercherParticipantNom(self.nom_complet)
+            return True
+            #Si l'entrée est "Aucun Joueur" , nous prenons l'entrée de la combobox des noms
+        if self.nom_complet == "Aucun joueur":
+            self.nom_complet = self.recherche_nom.get()
+                 #Si cette entrée est dans la liste de noms, on renvois le joueur avec ce nom
+            if self.nom_complet in self.noms_participants:
+                self.controlleur.participant_actuel = self.controlleur.mes_participants.rechercherParticipantNom(self.nom_complet)
+                return True
+                #Sinon, on lui dit que le joueur existe pas
+            else:
+                messagebox.showerror( "Erreur", "Entre le nom du joueur.")
+                return False
+                 
    
 
 
@@ -52,32 +65,69 @@ class Page_Gerer_Participants(ctk.CTkFrame):
             #fonction pour transformer un dicitonnaire en liste pour l'affichage de la combobox qui combine le nom et la categorie
     def transformer_dictionnaire_en_liste(self,dictionnaire): 
 
-        return [ f"{a} | {b}"   for a , b in dictionnaire.items() ]
+        return ["Aucun joueur"] + [f"{a} | {b}"   for a , b in dictionnaire.items() ]
     
-
-
-        #fonction pour mettre à jour la combobox de participants quand l'utilisateur tape son nom 
-    def uptade_liste_noms(self , *args):
-            #mettre la liste de noms a jour selon ce que l'utilisateur a entré
-         self.nouvelle_liste_noms = [ participant for participant in self.noms_participants if self.recherche_nom.get().lower() in participant.lower() ]
-            #mettre à jour la combobox de nom
-         self.liste_nom_combobox.configure(values = self.nouvelle_liste_noms)
-            #mettre à jour la combobox qui combine nom et categorie 
-         self.uptade_recherche_combine()
+        
 
 
 
-        #fonction pour mettre à jour la combobox de categories quand l'utilisateur tape la categorie
-    def uptade_liste_categories(self , *args):
+    def mettre_a_jour_combobox(self,*args):
+
+        self.nom = self.recherche_nom.get()
+        self.categorie = self.recherche_categorie.get()
+
+        if self.nom =="" and self.categorie == "":
+            self.liste_nom_combobox.configure(values = self.noms_participants)
+            self.liste_categorie_combobox.configure(values = self.categories)
+                #mettre à jour la combobox qui combine nom et categorie 
+            self.uptade_recherche_combine()
+            return
+            
+
+            #si le nom n'est pas vide, on uptade la combobox de nom et de categorie selon le nom 
+        if self.nom != "":
+                #mettre la liste de noms a jour selon ce que l'utilisateur a entré
+            self.nouvelle_liste_noms = [ participant for participant in self.noms_participants if self.recherche_nom.get().lower() in participant.lower() ]
+                #mettre à jour la combobox de nom
+            self.liste_nom_combobox.configure(values = self.nouvelle_liste_noms)
+
+                #mettre la combobox de categorie à jour selon l'entrée du nom
+            self.set_categorie = set()
+            for nom in self.nouvelle_liste_noms:
+                self.set_categorie.add(self.controlleur.mes_participants.rechercherParticipantNom(nom).categorie)
+
+                    #mettre la liste de categories a jour selon ce que l'utilisateur a entré et selon les noms disponible
+            self.nouvelle_liste_categories = list(self.set_categorie)
+                #mettre à jour la combobox de categories
+            self.liste_categorie_combobox.configure(values = self.nouvelle_liste_categories)
+
+                #mettre à jour la combobox qui combine nom et categorie 
+            self.uptade_recherche_combine()
+            return
+
+
+
+        #si le nom est vide, on uptade la liste de nom selon l'entré de categorie
+
+        if self.nom == "" and self.categorie != "":
+
                 #mettre la liste de categories a jour selon ce que l'utilisateur a entré
             self.nouvelle_liste_categories= [ categorie for categorie in self.categories if self.recherche_categorie.get().lower() in categorie.lower() ]
                 #mettre à jour la combobox de categories
             self.liste_categorie_combobox.configure(values = self.nouvelle_liste_categories)
                 #mettre à jour la combobox qui combine nom et categorie 
+
+                
+                #mettre la liste de noms a jour selon ce que l'utilisateur a entrée comme categorie
+            self.nouvelle_liste_noms = [ participant for participant in self.noms_participants if self.recherche_categorie.get().lower() 
+                                        in self.controlleur.mes_participants.rechercherParticipantNom(participant).categorie.lower() ]
+                #mettre à jour la combobox de nom
+            self.liste_nom_combobox.configure(values = self.nouvelle_liste_noms)
             self.uptade_recherche_combine()
+            return
 
 
-
+        
 
         #fonction pour mettre à jour la combobox qui combine les 2 recherches
     def uptade_recherche_combine(self):
@@ -102,6 +152,8 @@ class Page_Gerer_Participants(ctk.CTkFrame):
         self.nouvelle_liste_recherche_combine = self.transformer_dictionnaire_en_liste(
             self.nouveau_dictionnaire_recherche_combine
         )
+
+
 
             #On met à jour la combobox 
         self.recherche_combine_combobox.configure(values=self.nouvelle_liste_recherche_combine)
@@ -134,7 +186,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
         #combobox pour la recherche par les noms
             #apelle la fonction qui mets à jour la combobox quand l'entrée de l'utilisateur est modifié
-        self.recherche_nom.trace_add("write", self.uptade_liste_noms)#non il ne faut pas mettre de parenthèse à self.uptade_liste_noms, demande pas pourquoi
+        self.recherche_nom.trace_add("write", self.mettre_a_jour_combobox)#non il ne faut pas mettre de parenthèse à self.uptade_liste_noms, demande pas pourquoi
             #combobox de noms des participants 
         self.liste_nom_combobox = ctk.CTkComboBox(self.frame_page, values = self.noms_participants, variable = self.recherche_nom , height = 35 , width= 175)
         self.liste_nom_combobox.place(relx = 0.2 , rely = 0.55 , anchor = "center")
@@ -145,7 +197,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
         #combobox pour la recherche par la categorie
             #apelle la fonction qui met à jour la combobox quand l'entrée de l'utilisateur est modifié
-        self.recherche_categorie.trace_add("write", self.uptade_liste_categories) #non il ne faut pas mettre de parenthèse à self.uptade_liste_categories, demande pas pourquoi
+        self.recherche_categorie.trace_add("write", self.mettre_a_jour_combobox) #non il ne faut pas mettre de parenthèse à self.uptade_liste_categories, demande pas pourquoi
             #combobox des catégories 
         self.liste_categorie_combobox = ctk.CTkComboBox(self.frame_page, values = self.categories, variable = self.recherche_categorie , height = 35 , width= 175)
         self.liste_categorie_combobox.place(relx = 0.48, rely = 0.55, anchor = "center")
@@ -153,7 +205,7 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
 
          #label pour la combobox qui combine les 2 recherches
-        self.label_recherche_combine = ctk.CTkLabel(self.frame_page, text = "Résultats de vos recherches:\n Nom       Catégorie" , text_color="black" , font=("Arial", 15, "bold"))
+        self.label_recherche_combine = ctk.CTkLabel(self.frame_page, text = "Résultats de vos recherches:\n Nom | Catégorie" , text_color="black" , font=("Arial", 15, "bold"))
         self.label_recherche_combine.place(relx = 0.8, rely=0.45, anchor = "center")
         
 
@@ -182,6 +234,10 @@ class Page_Gerer_Participants(ctk.CTkFrame):
 
 
     def voir_statistiques_joueur(self):
-         self.mettre_a_jour_participant_choisi()
+         verification = self.mettre_a_jour_participant_choisi()
+
+         if not verification:
+              return 0
+
          from Page_visualiser_participant import page_visualiser_participant
          self.controlleur.changer_page(page_visualiser_participant)

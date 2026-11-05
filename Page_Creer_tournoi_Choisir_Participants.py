@@ -187,6 +187,14 @@ class Page_Creer_tournoi_Choisir_Participants(ctk.CTkFrame):
             )
             return
 
+
+        if  nom == "Aucun joueur":
+            messagebox.showerror(
+                "Erreur",
+                "Ce nom n'est pas accepté"
+            )
+            return
+
         banque = self.controlleur.mes_participants.banqueParticipant
 
         # Verifier si le joueur existe deja dans cette categorie

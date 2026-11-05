@@ -66,7 +66,7 @@ class MainApp(ctk.CTk):
         #  Crée le DataFrame à partir de cette liste
         df_modifie = pd.DataFrame(liste_dicts)
 
-        #  Réécrit le fichier proprement (écrase l'ancien contenu)
+        #  Réécrit le fichier 
         df_modifie.to_csv(fichier, index=False, sep=",")
         
         self.destroy()
